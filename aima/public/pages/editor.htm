@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>deal.ai - Page Editor</title>
+    <meta content="deal.ai - Page Editor" name="description">
+    <link rel="icon" href="/favicon.png" />
+    <link rel="stylesheet" href="stylesheets/toastr.min.css">
+    <link rel="stylesheet" href="stylesheets/grapes.min.css?v0.21.6">
+    <link rel="stylesheet" href="stylesheets/grapesjs-preset-webpage.min.css">
+    <link rel="stylesheet" href="stylesheets/tooltip.css">
+    <link rel="stylesheet" href="stylesheets/editor.css?v3">
+    <link href="https://unpkg.com/grapick/dist/grapick.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="js/toastr.min.js"></script>
+    <script src="js/grapes.min.js?v0.21.6"></script>
+    <script src="js/preset-webpage.js"></script>
+    <script src="https://unpkg.com/grapesjs-blocks-basic@1.0.1"></script>
+    <script src="https://unpkg.com/grapesjs-plugin-forms@2.0.5"></script>
+    <script src="https://unpkg.com/grapesjs-component-countdown@1.0.1"></script>
+    <script src="https://unpkg.com/grapesjs-plugin-export@1.0.11"></script>
+    <script src="https://unpkg.com/grapesjs-tabs@1.0.6"></script>
+    <script src="https://unpkg.com/grapesjs-custom-code@1.0.1"></script>
+    <script src="https://unpkg.com/grapesjs-touch@0.1.1"></script>
+    <script src="https://unpkg.com/grapesjs-parser-postcss@1.0.1"></script>
+    <script src="https://unpkg.com/grapesjs-tooltip@0.1.7"></script>
+    <script src="https://unpkg.com/grapesjs-tui-image-editor@0.1.3"></script>
+    <script src="https://unpkg.com/grapesjs-typed@1.0.5"></script>
+    <script src="https://unpkg.com/grapesjs-style-bg@2.0.1"></script>
+  </head>
+  <body>
+    <div id="gjs" style="height:0px; overflow:hidden"></div>
+
+    <div id="info-panel" style="display:none">
+      <br/>
+      <img class="info-panel-logo" src="/assets/images/logo.svg" />
+      <br/>
+      <div class="info-panel-label">
+        <b>GrapesJS Webpage Builder</b> is a simple showcase of what is possible to achieve with the
+        <a class="info-panel-link gjs-four-color" target="_blank" href="https://github.com/artf/grapesjs">GrapesJS</a>
+        core library
+        <br/><br/>
+        For any hint about the demo check the
+        <a class="info-panel-link gjs-four-color" target="_blank" href="https://github.com/artf/grapesjs-preset-webpage">Webpage Preset repository</a>
+        and open an issue. For problems with the builder itself, open an issue on the main
+        <a class="info-panel-link gjs-four-color" target="_blank" href="https://github.com/artf/grapesjs">GrapesJS repository</a>
+        <br/><br/>
+        Being a free and open source project contributors and supporters are extremely welcome.
+        If you like the project support it with a donation of your choice or become a backer/sponsor via
+        <a class="info-panel-link gjs-four-color" target="_blank" href="https://opencollective.com/grapesjs">Open Collective</a>
+      </div>
+    </div>
+
+    <div id="saving-overlay" style="display:none">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        style="position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);"
+        width="100"
+        height="100"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="xMidYMid"
+      >
+        <g transform="translate(80,50)">
+        <g transform="rotate(0)">
+        <circle cx="0" cy="0" r="6" fill="#efefef" fill-opacity="1">
+          <animateTransform attributeName="transform" type="scale" begin="-1.3888888888888888s" values="1.5 1.5;1 1" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite"></animateTransform>
+          <animate attributeName="fill-opacity" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite" values="1;0" begin="-1.3888888888888888s"></animate>
+        </circle>
+        </g>
+        </g><g transform="translate(71.21320343559643,71.21320343559643)">
+        <g transform="rotate(45)">
+        <circle cx="0" cy="0" r="6" fill="#efefef" fill-opacity="0.875">
+          <animateTransform attributeName="transform" type="scale" begin="-1.1904761904761905s" values="1.5 1.5;1 1" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite"></animateTransform>
+          <animate attributeName="fill-opacity" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite" values="1;0" begin="-1.1904761904761905s"></animate>
+        </circle>
+        </g>
+        </g><g transform="translate(50,80)">
+        <g transform="rotate(90)">
+        <circle cx="0" cy="0" r="6" fill="#efefef" fill-opacity="0.75">
+          <animateTransform attributeName="transform" type="scale" begin="-0.9920634920634921s" values="1.5 1.5;1 1" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite"></animateTransform>
+          <animate attributeName="fill-opacity" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite" values="1;0" begin="-0.9920634920634921s"></animate>
+        </circle>
+        </g>
+        </g><g transform="translate(28.786796564403577,71.21320343559643)">
+        <g transform="rotate(135)">
+        <circle cx="0" cy="0" r="6" fill="#efefef" fill-opacity="0.625">
+          <animateTransform attributeName="transform" type="scale" begin="-0.7936507936507936s" values="1.5 1.5;1 1" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite"></animateTransform>
+          <animate attributeName="fill-opacity" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite" values="1;0" begin="-0.7936507936507936s"></animate>
+        </circle>
+        </g>
+        </g><g transform="translate(20,50.00000000000001)">
+        <g transform="rotate(180)">
+        <circle cx="0" cy="0" r="6" fill="#efefef" fill-opacity="0.5">
+          <animateTransform attributeName="transform" type="scale" begin="-0.5952380952380952s" values="1.5 1.5;1 1" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite"></animateTransform>
+          <animate attributeName="fill-opacity" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite" values="1;0" begin="-0.5952380952380952s"></animate>
+        </circle>
+        </g>
+        </g><g transform="translate(28.78679656440357,28.786796564403577)">
+        <g transform="rotate(225)">
+        <circle cx="0" cy="0" r="6" fill="#efefef" fill-opacity="0.375">
+          <animateTransform attributeName="transform" type="scale" begin="-0.3968253968253968s" values="1.5 1.5;1 1" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite"></animateTransform>
+          <animate attributeName="fill-opacity" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite" values="1;0" begin="-0.3968253968253968s"></animate>
+        </circle>
+        </g>
+        </g><g transform="translate(49.99999999999999,20)">
+        <g transform="rotate(270)">
+        <circle cx="0" cy="0" r="6" fill="#efefef" fill-opacity="0.25">
+          <animateTransform attributeName="transform" type="scale" begin="-0.1984126984126984s" values="1.5 1.5;1 1" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite"></animateTransform>
+          <animate attributeName="fill-opacity" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite" values="1;0" begin="-0.1984126984126984s"></animate>
+        </circle>
+        </g>
+        </g><g transform="translate(71.21320343559643,28.78679656440357)">
+        <g transform="rotate(315)">
+        <circle cx="0" cy="0" r="6" fill="#efefef" fill-opacity="0.125">
+          <animateTransform attributeName="transform" type="scale" begin="0s" values="1.5 1.5;1 1" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite"></animateTransform>
+          <animate attributeName="fill-opacity" keyTimes="0;1" dur="1.5873015873015872s" repeatCount="indefinite" values="1;0" begin="0s"></animate>
+        </circle>
+        </g>
+        </g>
+      </svg>
+    </div>
+
+    <script src="js/editor/utils.js?v=5"></script>
+    <script src="js/editor/style.js?v=5"></script>
+    <script src="js/editor/editor.js?v=5"></script>
+    <script type="text/javascript">
+
+      initializeEditor().then(() => {
+        modifyEditor();
+      });
+      
+    </script>
+  </body>
+</html>

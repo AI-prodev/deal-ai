@@ -1,0 +1,18 @@
+.Subtitle {
+  display: block;
+  line-height: normal;
+}
+
+@media (max-width: 768px) {
+  .Subtitle {
+    font-size: 22px !important;
+    padding: 10px 20px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .Subtitle {
+    font-size: 20px !important;
+    padding: 10px !important;
+  }
+}

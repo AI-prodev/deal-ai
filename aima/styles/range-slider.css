@@ -1,0 +1,11 @@
+.gradient-slider {
+  width: 100% !important;
+}
+
+.gradient-slider::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    rgb(16, 16, 225),
+    rgb(216, 21, 21)
+  ) !important;
+}

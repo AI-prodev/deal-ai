@@ -1,0 +1,15 @@
+.URL {
+  display: flex;
+}
+
+.URL-left {
+  justify-content: flex-start;
+}
+
+.URL-center {
+  justify-content: center;
+}
+
+.URL-right {
+  justify-content: flex-end;
+}

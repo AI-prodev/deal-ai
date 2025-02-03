@@ -1,0 +1,51 @@
+.EmailForm {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.EmailForm-title-left {
+  margin-right: auto;
+}
+
+.EmailForm-title-center {
+  margin: 0 auto;
+}
+
+.EmailForm-title-right {
+  margin-left: auto;
+}
+
+.EmailForm-input {
+  margin-top: 16px;
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid rgb(224, 230, 237) !important;
+  background-color: #ffffff !important;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: rgb(14, 23, 38) !important;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  padding: 8px 16px;
+}
+
+.EmailForm-button {
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .EmailForm {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .EmailForm-button {
+    font-size: 16px !important;
+    padding: 15px 20px !important;
+  }
+}

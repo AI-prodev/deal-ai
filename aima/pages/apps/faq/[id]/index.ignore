@@ -1,0 +1,149 @@
+import withAuth from "@/helpers/withAuth";
+import { USER_ROLES } from "@/utils/roles";
+import React, { useEffect, useState } from "react";
+
+import Link from "next/link";
+import { useRouter } from "next/router";
+
+import {
+  useEndFaqRequestMutation,
+  useQueryFaqRequestMutation,
+} from "@/store/features/bonusAndFaqApi";
+import { showErrorToastTimer } from "@/utils/toast";
+import { BonusAndFaqResults } from "@/components/marketingHooks/BonusAndFaqResults";
+import { ThesisBuildingProgress } from "@/components/ThesisBuildingProgress";
+import AppCard from "@/components/AppCard";
+
+type Props = {};
+
+export type HookData = { id: number; hooks: any[]; language?: string };
+
+const FAQStack = (props: Props) => {
+  const [remainingTime, setRemainingTime] = useState(180);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMesssage, setErrorMessage] = useState("");
+
+  const [generationCount, setGenerationCount] = useState(0);
+  const router = useRouter();
+  const trackId = router.query.id as string;
+
+  const [queryFaqRequest] = useQueryFaqRequestMutation({});
+  const [endFaqRequest] = useEndFaqRequestMutation();
+  const minutes = Math.floor(remainingTime / 60);
+  const seconds = remainingTime % 60;
+  const [hooksData, setHooksData] = useState<HookData[]>([]);
+  useEffect(() => {
+    if (trackId) {
+      setIsLoading(true);
+      trackProgress(trackId);
+      setRemainingTime(180);
+    }
+  }, [trackId]);
+
+  const trackProgress = async (token: string) => {
+    let completed = false;
+    let delay = 2000;
+    const maxDelay = 30000;
+
+    while (!completed) {
+      try {
+        const statusResult = await queryFaqRequest({ token }).unwrap();
+
+        if (statusResult.status === "completed") {
+          completed = true;
+          const endResult = await endFaqRequest({ token }).unwrap();
+
+          //@ts-ignore
+          if (endResult && endResult.response) {
+            const newGeneration = {
+              id: generationCount + 1,
+              hooks: endResult.response,
+            } as HookData;
+            setHooksData((prevHooksData) => {
+              if (
+                !prevHooksData.some(
+                  (hookData) => hookData.id === newGeneration.id,
+                )
+              ) {
+                return [newGeneration, ...prevHooksData];
+              } else {
+                return prevHooksData;
+              }
+            });
+            setGenerationCount(generationCount + 1);
+            setIsLoading(false);
+          }
+        } else if (statusResult.status === "error") {
+          setIsLoading(false);
+          completed = true;
+          showErrorToastTimer({ title: "Error generating hooks" });
+        } else {
+          delay = Math.min(delay * 1.5, maxDelay);
+          setIsLoading(true);
+        }
+
+        await new Promise((res) => setTimeout(res, delay));
+      } catch (error) {
+        console.error("Error tracking progress:", error);
+        setIsLoading(false);
+        completed = true;
+        //@ts-ignore
+        if (error.data === "Request not found.") {
+          router.push("/apps/faq");
+          setErrorMessage("Use Benefit Stacks Tool First");
+        }
+
+        break;
+      }
+    }
+  };
+
+  return (
+    <div>
+      <div className="p-3 ">
+        <div className="w-full justify-center pt-2">
+          {errorMesssage ? (
+            <div className="flex flex-col items-start justify-start">
+              <div className="my-3 pt-2">
+                <h2 className="mt-2 text-2xl font-bold">FAQs ❓</h2>
+              </div>
+              <AppCard
+                href="/apps/benefit-stack"
+                image="/assets/images/faq.png"
+                name={errorMesssage}
+                unreleased={true}
+              />
+            </div>
+          ) : (
+            <>
+              <div className="my-4">
+                <div>
+                  <h2 className="text-2xl font-bold">FAQs ❓</h2>
+                </div>
+              </div>
+              {/* {isLoading && (
+                <ThesisBuildingProgress
+                  minutes={minutes}
+                  seconds={seconds}
+                  progressCss={
+                    "bg-primary h-4 rounded-full w-12/12 animated-progress"
+                  }
+                />
+              )} */}
+
+              <BonusAndFaqResults
+                hooksData={hooksData}
+                title="FAQs"
+                type="faq"
+                isCreatingMore={isLoading}
+                remainingTime={remainingTime}
+              />
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default withAuth(FAQStack, USER_ROLES);

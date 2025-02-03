@@ -1,0 +1,11 @@
+@media (max-width: 768px) {
+  .Typography {
+    width: fit-content !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .Typography {
+    width: 100% !important;
+  }
+}

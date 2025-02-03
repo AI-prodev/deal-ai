@@ -1,0 +1,18 @@
+._Puck_mowzv_19 {
+  margin-top: 67px;
+}
+
+._Puck-leftSideBar_mowzv_132,
+._PuckCanvas_6zd4y_1,
+._Puck-rightSideBar_mowzv_131 {
+  height: calc(100vh - 134px) !important;
+}
+
+._Puck-header_mowzv_105 ._MenuBar_8pf8c_1 ._Button_1t64k_1 {
+  display: none !important;
+}
+
+._ArrayFieldItem-fieldset_1lr58_173,
+._ObjectField-fieldset_15j63_13 {
+  min-width: 0;
+}

@@ -1,0 +1,135 @@
+import withAuth from "@/helpers/withAuth";
+import { USER_ROLES } from "@/utils/roles";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import {
+  useEndBonusStackRequestMutation,
+  useQueryBonusStackRequestMutation,
+  useStartBonusStackRequestMutation,
+} from "@/store/features/bonusAndFaqApi";
+import { showErrorToastTimer } from "@/utils/toast";
+import { BonusAndFaqResults } from "@/components/marketingHooks/BonusAndFaqResults";
+import { ThesisBuildingProgress } from "@/components/ThesisBuildingProgress";
+import AppCard from "@/components/AppCard";
+import LocalFunnelHooks from "@/components/funnels/LocalFunnelHooks";
+
+type Props = {};
+
+export type HookData = { id: number; hooks: any[] };
+interface FormValues {
+  businessDescription: string;
+  tone: string;
+  toneAdditionalInfo: string;
+  aggressiveness: number;
+  hookCreative: number;
+  hookLength: number;
+  targetAudience: string;
+  language: string;
+}
+
+const BonusStack = (props: Props) => {
+  const [businessDescription, setBusinessDescription] = useState("");
+  const [hookLength, setHookLength] = useState(7);
+  const [aggressiveness, setAggressiveness] = useState(8);
+  const [hookCreative, setHookCreative] = useState(10);
+  const [language, setLanguage] = useState("English");
+  const [targetAudience, setTargetAudience] = useState("everyone");
+  const [tone, setTone] = useState("Inspirational");
+  const [toneAdditionalInfo, setToneAdditionalInfo] = useState("");
+
+  const router = useRouter();
+  const trackId = router.query.id as string;
+  const [startBonusRequest, { isLoading: isStartingBonus }] =
+    useStartBonusStackRequestMutation();
+
+  const storedGeneration = localStorage.getItem("mostRecentGenerationData");
+
+  const handleCreateBonuseStack = async () => {
+    const hookData = storedGeneration && JSON.parse(storedGeneration);
+    let benefitStack;
+    const generationHooks = hookData.hooks;
+    if (generationHooks) {
+      const hooksText = generationHooks
+        .map((hook: any) => `${hook.n} - ${hook.a}`)
+        .join("\n");
+      benefitStack = hooksText;
+    }
+
+    const data = {
+      businessDescription: businessDescription,
+      benefitStack: benefitStack,
+      hookLength: hookLength,
+      aggressiveness: aggressiveness,
+      hookCreative: hookCreative,
+      language: language,
+      targetAudience: targetAudience,
+      tone: tone,
+      toneAdditionalInfo: toneAdditionalInfo,
+    };
+
+    try {
+      const startResult = await startBonusRequest({
+        input: data,
+      }).unwrap();
+      if (startResult.token) {
+        const url = `/apps/bonus-stack/${startResult.token}`;
+        // window.open(url, "_blank");
+        router.push(url);
+      }
+
+    } catch (error) {
+      console.error("Failed to create hooks", error);
+    }
+  };
+  const handleValuesChange = (values: FormValues) => {
+    setBusinessDescription(values.businessDescription);
+    setHookLength(values.hookLength);
+    setAggressiveness(values.aggressiveness);
+    setHookCreative(values.hookCreative);
+    setLanguage(values.language);
+    setTargetAudience(values.targetAudience);
+    setTone(values.tone);
+    setToneAdditionalInfo(values.toneAdditionalInfo);
+  };
+
+  return (
+    <div>
+      <div className="p-3 ">
+        <div className="w-full justify-center pt-2">
+          <div className="my-4">
+            <div>
+              <h2 className="text-2xl font-bold">Bonus Stack</h2>
+            </div>
+            <div className="w-full max-w-lg">
+              {storedGeneration ? (
+                <>
+                  <LocalFunnelHooks onValuesChange={handleValuesChange} />
+                  <button
+                    onClick={handleCreateBonuseStack}
+                    className="btn btn-primary !my-6"
+                  >
+                    Create Bonus Stack
+                  </button>
+                </>
+              ) : (
+                <>
+                  <h3 className="mt-2 text-md font-bold text-white">Create a benefit stack before creating your bonus stack.</h3>
+                  <button
+                    onClick={() => router.push("/apps/benefit-stack")}
+                    className="btn btn-primary !my-6"
+                    disabled={isStartingBonus}
+                  >
+                    Create Benefit Stack First
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default withAuth(BonusStack, USER_ROLES);

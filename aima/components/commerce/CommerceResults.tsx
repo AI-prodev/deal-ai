@@ -1,0 +1,771 @@
+// components/CommerceResults.tsx
+import Tippy from "@tippyjs/react";
+import React, { useEffect, useState } from "react";
+import StarRating from "../marketingHooks/StarRating";
+import useServerTokenTracking from "@/hooks/useServerTokenTracking";
+import { CommerceHook } from "@/pages/apps/commerce";
+import {
+  useStartProductPlacementRequestMutation,
+  useQueryProductPlacementRequestMutation,
+  useEndProductPlacementRequestMutation,
+  useUploadEditedImageMutation,
+} from "@/store/features/marketingHooksApi";
+import CustomPinturaEditorModal from "../CustomPinturaEditorModal";
+import { Dialog } from "@headlessui/react";
+import "@pqina/pintura/pintura.css";
+import {
+  useDeleteSpecificCreationMutation,
+  useDeleteSpecificGenerationMutation,
+  useGetSpecifcAppsPojectAppNameQuery,
+} from "@/store/features/appsProjectApi";
+
+interface SectionProps {
+  content: any;
+  isLoading: boolean;
+}
+
+// A generic loading placeholder for content sections
+const LoadingPlaceholder: React.FC = () => (
+  <div className="animate-pulse space-y-4">
+    <div className="h-4 rounded bg-gray-700"></div>
+    <div className="h-4 rounded bg-gray-600"></div>
+    <div className="h-4 w-5/6 rounded bg-gray-700"></div>
+  </div>
+);
+
+interface CommerceResultsProps {
+  id: string;
+  image?: {
+    content: string;
+    isLoading: boolean;
+    input?: string;
+    originUrl?: string;
+    editedContent?: string | undefined;
+  };
+  magicHook: SectionProps;
+  seoTags: SectionProps;
+  productDescription: SectionProps;
+  benefitStack: SectionProps;
+  faq: {
+    content: { q: string; a: string }[];
+    isLoading: boolean;
+  };
+  onRemove: (id: string) => void;
+  rating?: number;
+  onRatingChange?: any;
+  ratingLoading: boolean;
+  setHooksData: React.Dispatch<React.SetStateAction<CommerceHook[]>>;
+  contentItemsId: string;
+  refetchAppData: any;
+}
+
+const CommerceResults: React.FC<CommerceResultsProps> = ({
+  id,
+  image,
+  magicHook,
+  seoTags,
+  productDescription,
+  benefitStack,
+  faq,
+  onRemove,
+  rating,
+  onRatingChange,
+  ratingLoading,
+  setHooksData,
+  contentItemsId,
+  refetchAppData,
+}) => {
+  const [startProductPlacement, { isLoading: isLoadingStartProductPlacement }] =
+    useStartProductPlacementRequestMutation();
+  const [queryProductPlacement] = useQueryProductPlacementRequestMutation();
+  const [endProductPlacement] = useEndProductPlacementRequestMutation();
+
+  const handleDownload = async (img: any) => {
+    const response = await fetch(img);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `deal-ai-commerce.png`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+  };
+
+  const formatDataForCopy = () => {
+    let dataToCopy = "";
+    const magic = magicHook.content[0]?.id
+      ? magicHook.content[0].content
+      : magicHook.content[0];
+    const productDescriptionContent = productDescription.content[0]?.id
+      ? productDescription.content.map((item: any) => item.content).join("\n")
+      : productDescription.content.map((item: any) => item).join("\n");
+    const benefitStackContent = benefitStack.content[0]?.id
+      ? benefitStack.content.map((item: any) => `- ${item.content}`).join("\n")
+      : benefitStack.content.map((item: any) => `- ${item}`).join("\n");
+    dataToCopy += `Magic Hook\n${magic}\n\n`;
+    dataToCopy += `${magic}\n\n${productDescriptionContent}\n\n`;
+    dataToCopy += `${benefitStackContent}\n\n`;
+    dataToCopy += `FAQs\n${faq.content
+      .map(faqItem => `Q: ${faqItem.q}\nA: ${faqItem.a}`)
+      .join("\n\n")}`;
+
+    return dataToCopy;
+  };
+
+  const handleCopy = () => {
+    const dataToCopy = formatDataForCopy();
+    navigator.clipboard.writeText(dataToCopy).then(
+      () => {},
+      err => {
+        console.error("Could not copy text: ", err);
+      }
+    );
+  };
+
+  const handleCopySeo = () => {
+    const dataToCopy =
+      seoTags?.content?.length > 0
+        ? seoTags.content[0]?.id
+          ? seoTags.content.map((item: any) => item.tag).join(", ")
+          : seoTags.content.join(", ")
+        : "";
+
+    navigator.clipboard.writeText(dataToCopy).then(
+      () => {},
+      err => {
+        console.error("Could not copy text: ", err);
+      }
+    );
+  };
+
+  const updateHookData = (updatedHook: any) => {
+    setHooksData(prevData => {
+      const updatedData = prevData.map(hook => {
+        if (hook.id === updatedHook.id) {
+          return { ...hook, ...updatedHook };
+        }
+        return hook;
+      });
+
+      return updatedData;
+    });
+
+    const localStorageData = JSON.parse(
+      localStorage.getItem("commerceHooksData") || "[]"
+    );
+    const updatedLocalStorageData = localStorageData.map((hook: any) => {
+      if (hook.id === updatedHook.id) {
+        return { ...hook, ...updatedHook };
+      }
+      return hook;
+    });
+
+    localStorage.setItem(
+      "commerceHooksData",
+      JSON.stringify(updatedLocalStorageData)
+    );
+  };
+
+  const handleEndResponseProductPlacement = (data: any) => {
+    const response = data?.response;
+    if (response) {
+      const updatedHookData: Partial<CommerceHook> = {
+        id: id,
+        image: {
+          ...image,
+          content: response && response[0]?.url,
+          input: response && response[0]?.input?.prompt,
+          originUrl: image?.originUrl,
+          isLoading: false,
+        },
+      };
+      updateHookData(updatedHookData);
+      setIsEditedImagePreviewOpen(false);
+      setOpenedPreviews(prev => {
+        const newPreviews = { ...prev };
+        delete newPreviews[id];
+        return newPreviews;
+      });
+    }
+  };
+
+  const {
+    startAndTrack: startAndTrackProductPlacement,
+    isLoading: isLoadingProductPlacement,
+    generationCount: generationCountProductPlacement,
+  } = useServerTokenTracking({
+    startRequest: startProductPlacement as any,
+    queryRequest: queryProductPlacement as any,
+    endRequest: endProductPlacement as any,
+    tokenKey: "productPlacementToken",
+    onEndResponse: handleEndResponseProductPlacement,
+    geneationType: false,
+    isLocalOnEndResponse: true,
+  });
+
+  const [isEditedImagePreviewOpen, setIsEditedImagePreviewOpen] =
+    useState(false);
+  const [openedPreviews, setOpenedPreviews] = useState<{
+    [hookId: string]: string | undefined;
+  }>({});
+
+  const regeneratePlacement = async (input: string, originUrl: string) => {
+    const submissionDataProductPlacement = {
+      n: 1,
+      url: originUrl,
+      prompt: input,
+    };
+
+    const updatedHookData: Partial<CommerceHook> = {
+      id: id,
+      image: {
+        ...image,
+        content: originUrl,
+        originUrl: originUrl,
+        //@ts-ignore
+        editedContent: undefined,
+        isLoading: true,
+      },
+    };
+    setIsEditedImagePreviewOpen(false);
+    setOpenedPreviews(prev => {
+      const newPreviews = { ...prev };
+      delete newPreviews[id];
+      return newPreviews;
+    });
+    updateHookData(updatedHookData);
+    await startAndTrackProductPlacement(submissionDataProductPlacement);
+  };
+
+  const [isPinturaOpen, setIsPinturaOpen] = useState(false);
+  const [editableImage, setEditableImage] = useState<string | null>(null);
+
+  const [selectedEditedImageUrl, setSelectedEditedImageUrl] = useState("");
+  const [uploadEditedImage, { isLoading: uploadImageLoading }] =
+    useUploadEditedImageMutation();
+  const [editableImageId, setEditableImageId] = useState<string | null>(null);
+
+  const handleEditImage = (hook: any, isEditedImagePreviewOpen: boolean) => {
+    setEditableImage(
+      isEditedImagePreviewOpen ? hook.editedContent : hook.content
+    );
+    setIsPinturaOpen(true);
+
+    setEditableImageId(hook.id);
+  };
+
+  const onEditComplete = async (data: any) => {
+    setIsPinturaOpen(false);
+    setEditableImage(null);
+
+    const file = data.dest;
+    if (!(file instanceof Blob)) {
+      console.error("Edited image is not a Blob");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("creationId", editableImageId as string);
+    try {
+      const uploadResponse = await uploadEditedImage(formData).unwrap();
+      const updatedEditedImageUrl = uploadResponse.url;
+
+      if (updatedEditedImageUrl) {
+        refetchAppData().unwrap();
+      }
+      // updateHookData({
+      //   id: id,
+      //   image: {
+      //     ...image,
+      //     editedContent: uploadResponse.url,
+      //     isLoading: false,
+      //   },
+      // });
+      // openEditedImagePreview(uploadResponse.url, id, true);
+      setIsEditedImagePreviewOpen(true);
+    } catch (error) {
+      console.error("Error uploading edited image:", error);
+    }
+  };
+
+  const openEditedImagePreview = (
+    editedImageUrl: string,
+    hookId: string,
+    isInitialization: boolean = false
+  ) => {
+    setIsEditedImagePreviewOpen(!isEditedImagePreviewOpen);
+
+    setOpenedPreviews(prev => {
+      if (isInitialization && prev[hookId]) {
+        return prev;
+      }
+
+      const isCurrentlyOpen = !!prev[hookId];
+      if (isCurrentlyOpen) {
+        const { [hookId]: _, ...rest } = prev;
+        return rest;
+      } else {
+        return { ...prev, [hookId]: editedImageUrl };
+      }
+    });
+  };
+  useEffect(() => {
+    if (image?.editedContent) {
+      openEditedImagePreview(image.editedContent, id, true);
+    }
+  }, [image]);
+
+  return (
+    <div
+      className="container mx-auto my-8 rounded-lg bg-gray-800 p-4 shadow-xl"
+      key={id}
+    >
+      <Dialog
+        open={isPinturaOpen}
+        onClose={() => setIsPinturaOpen(false)}
+        className="fixed inset-0 z-50 overflow-y-auto"
+      >
+        <div className="flex min-h-screen items-center justify-center">
+          <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50" />
+
+          <div
+            className="relative mx-auto h-full w-full max-w-4xl rounded-lg bg-white p-6"
+            style={{ height: "70vh" }}
+          >
+            <CustomPinturaEditorModal
+              onEditComplete={onEditComplete}
+              editableImage={editableImage}
+              setIsPinturaOpen={setIsPinturaOpen}
+            />
+          </div>
+        </div>
+      </Dialog>
+
+      <div className="flex items-end justify-end p-2">
+        {!id.includes("hook") && (
+          <StarRating
+            rating={rating as number}
+            setRating={newRating => onRatingChange(contentItemsId, newRating)}
+            isLoading={ratingLoading || isLoadingStartProductPlacement}
+          />
+        )}
+      </div>
+      {image?.content ? (
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="relative max-w-fit overflow-hidden rounded-lg  p-0 md:flex-row">
+            <img
+              //      src={image.content}
+              src={
+                !!openedPreviews[id] && openedPreviews[id]
+                  ? image?.editedContent
+                      ?.replace("/upload/", "/upload/f_auto,q_auto/")
+                      ?.replace(".png", "")
+                  : image?.content
+                      ?.replace("/upload/", "/upload/f_auto,q_auto/")
+                      ?.replace(".png", "")
+              }
+              alt="Product"
+              className={`w-full object-contain transition ${
+                (image.isLoading || uploadImageLoading) && "animate-pulse"
+              } duration-300 hover:scale-110`}
+            />
+
+            {image?.editedContent && (
+              <button
+                className="absolute left-3 top-3 z-10 rounded-full bg-orange-500 px-4 py-2 text-xs font-bold uppercase text-white shadow outline-none transition-all duration-150 ease-linear hover:bg-orange-600 hover:shadow-md focus:outline-none"
+                onClick={() =>
+                  openEditedImagePreview(image?.editedContent ?? "", id)
+                }
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M16 9.5L8 9.5M8 9.5L10.75 7M8 9.5L10.75 12"
+                    stroke="#ffffff"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M8 14.5L16 14.5M16 14.5L13.25 12M16 14.5L13.25 17"
+                    stroke="#ffffff"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M7 3.33782C8.47087 2.48697 10.1786 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 10.1786 2.48697 8.47087 3.33782 7"
+                    stroke="#ffffff"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </button>
+            )}
+            <div className="absolute right-3 top-3 flex items-end justify-end">
+              {image?.input && !ratingLoading && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    regeneratePlacement(
+                      image?.input as string,
+                      image.originUrl as string
+                    );
+                  }}
+                  className="mx-1 rounded bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M2.93077 11.2003C3.00244 6.23968 7.07619 2.25 12.0789 2.25C15.3873 2.25 18.287 3.99427 19.8934 6.60721C20.1103 6.96007 20.0001 7.42199 19.6473 7.63892C19.2944 7.85585 18.8325 7.74565 18.6156 7.39279C17.2727 5.20845 14.8484 3.75 12.0789 3.75C7.8945 3.75 4.50372 7.0777 4.431 11.1982L4.83138 10.8009C5.12542 10.5092 5.60029 10.511 5.89203 10.8051C6.18377 11.0991 6.18191 11.574 5.88787 11.8657L4.20805 13.5324C3.91565 13.8225 3.44398 13.8225 3.15157 13.5324L1.47176 11.8657C1.17772 11.574 1.17585 11.0991 1.46759 10.8051C1.75933 10.5111 2.2342 10.5092 2.52824 10.8009L2.93077 11.2003ZM19.7864 10.4666C20.0786 10.1778 20.5487 10.1778 20.8409 10.4666L22.5271 12.1333C22.8217 12.4244 22.8245 12.8993 22.5333 13.1939C22.2421 13.4885 21.7673 13.4913 21.4727 13.2001L21.0628 12.7949C20.9934 17.7604 16.9017 21.75 11.8825 21.75C8.56379 21.75 5.65381 20.007 4.0412 17.3939C3.82366 17.0414 3.93307 16.5793 4.28557 16.3618C4.63806 16.1442 5.10016 16.2536 5.31769 16.6061C6.6656 18.7903 9.09999 20.25 11.8825 20.25C16.0887 20.25 19.4922 16.9171 19.5625 12.7969L19.1546 13.2001C18.86 13.4913 18.3852 13.4885 18.094 13.1939C17.8028 12.8993 17.8056 12.4244 18.1002 12.1333L19.7864 10.4666Z"
+                        fill="#FFFFFF"
+                      />
+                    </svg>
+                  </svg>
+                </button>
+              )}
+
+              <button
+                className="mx-1 rounded bg-yellow-500 px-4 py-2 text-xs font-bold uppercase  shadow outline-none transition-all duration-150 ease-linear hover:shadow-md focus:outline-none"
+                onClick={() =>
+                  handleEditImage(
+                    image as any,
+                    !!openedPreviews[id] && openedPreviews[id] ? true : false
+                  )
+                }
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M14.3601 4.07866L15.2869 3.15178C16.8226 1.61607 19.3125 1.61607 20.8482 3.15178C22.3839 4.68748 22.3839 7.17735 20.8482 8.71306L19.9213 9.63993M14.3601 4.07866C14.3601 4.07866 14.4759 6.04828 16.2138 7.78618C17.9517 9.52407 19.9213 9.63993 19.9213 9.63993M14.3601 4.07866L12 6.43872M19.9213 9.63993L14.6607 14.9006L11.5613 18L11.4001 18.1612C10.8229 18.7383 10.5344 19.0269 10.2162 19.2751C9.84082 19.5679 9.43469 19.8189 9.00498 20.0237C8.6407 20.1973 8.25352 20.3263 7.47918 20.5844L4.19792 21.6782M4.19792 21.6782L3.39584 21.9456C3.01478 22.0726 2.59466 21.9734 2.31063 21.6894C2.0266 21.4053 1.92743 20.9852 2.05445 20.6042L2.32181 19.8021M4.19792 21.6782L2.32181 19.8021M2.32181 19.8021L3.41556 16.5208C3.67368 15.7465 3.80273 15.3593 3.97634 14.995C4.18114 14.5653 4.43213 14.1592 4.7249 13.7838C4.97308 13.4656 5.26166 13.1771 5.83882 12.5999L8.5 9.93872"
+                    stroke="#FFFFFF"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </button>
+
+              <button
+                className="mx-1 rounded bg-green-500 px-4 py-2 text-xs font-bold uppercase text-white shadow outline-none transition-all duration-150 ease-linear hover:shadow-md focus:outline-none"
+                onClick={() =>
+                  handleDownload(
+                    !!openedPreviews[id] && openedPreviews[id]
+                      ? image.editedContent
+                          ?.replace("/upload/", "/upload/f_auto,q_auto/")
+                          ?.replace(".png", "")
+                      : image.content
+                          ?.replace("/upload/", "/upload/f_auto,q_auto/")
+                          ?.replace(".png", "")
+                  )
+                }
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 3V16M12 16L16 11.625M12 16L8 11.625"
+                    stroke="#FFFFFF"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M15 21H9C6.17157 21 4.75736 21 3.87868 20.1213C3 19.2426 3 17.8284 3 15M21 15C21 17.8284 21 19.2426 20.1213 20.1213C19.8215 20.4211 19.4594 20.6186 19 20.7487"
+                    stroke="#FFFFFF"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-4 p-4">
+            <h2 className="text-lg font-semibold text-gray-200">Magic Hook</h2>
+            {magicHook.isLoading ? (
+              <LoadingPlaceholder />
+            ) : (
+              <p className="text-gray-300">
+                {magicHook.content[0]?.id
+                  ? magicHook.content[0].content
+                  : magicHook.content[0]}
+              </p>
+            )}
+            {seoTags.isLoading ? (
+              <LoadingPlaceholder />
+            ) : (
+              seoTags.content.length > 0 && (
+                <div className="mt-2">
+                  <h3 className="text-lg font-semibold text-gray-200">
+                    SEO Tags
+                    <Tippy content="Copy SEO tags" placement="top">
+                      <button
+                        className="mb-5 rounded bg-blue-500 px-4 py-2 text-xs font-bold uppercase text-white shadow outline-none transition-all duration-150 ease-linear hover:shadow-md focus:outline-none active:bg-blue-600 md:mb-0 md:ml-4"
+                        onClick={handleCopySeo}
+                      >
+                        <svg
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M20.9983 10C20.9862 7.82497 20.8897 6.64706 20.1213 5.87868C19.2426 5 17.8284 5 15 5H12C9.17157 5 7.75736 5 6.87868 5.87868C6 6.75736 6 8.17157 6 11V16C6 18.8284 6 20.2426 6.87868 21.1213C7.75736 22 9.17157 22 12 22H15C17.8284 22 19.2426 22 20.1213 21.1213C21 20.2426 21 18.8284 21 16V15"
+                            stroke="#FFFFFF"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                          />
+
+                          <path
+                            d="M3 10V16C3 17.6569 4.34315 19 6 19M18 5C18 3.34315 16.6569 2 15 2H11C7.22876 2 5.34315 2 4.17157 3.17157C3.51839 3.82475 3.22937 4.69989 3.10149 6"
+                            stroke="#FFFFFF"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                          />
+                        </svg>
+                      </button>
+                    </Tippy>
+                  </h3>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {seoTags.content.map((tag: any, index: any) => (
+                      <span
+                        key={index}
+                        className="badge inline-block rounded-full bg-blue-600 px-3 py-1 text-sm"
+                      >
+                        {tag.id ? tag.tag : tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4 p-4">
+          <h2 className="text-xl font-bold text-white">Magic Hook</h2>
+          {magicHook.isLoading ? (
+            <LoadingPlaceholder />
+          ) : (
+            <p className="text-gray-300">
+              {magicHook.content[0]?.id
+                ? magicHook.content[0].content
+                : magicHook.content[0]}
+            </p>
+          )}
+          {seoTags.isLoading ? (
+            <LoadingPlaceholder />
+          ) : (
+            seoTags.content.length > 0 && (
+              <div className="mt-2">
+                <h3 className="text-lg font-semibold text-gray-200">
+                  SEO Tags
+                  <Tippy content="Copy SEO tags" placement="top">
+                    <button
+                      className="mb-5 rounded bg-blue-500 px-4 py-2 text-xs font-bold uppercase text-white shadow outline-none transition-all duration-150 ease-linear hover:shadow-md focus:outline-none active:bg-blue-600 md:mb-0 md:ml-4"
+                      onClick={handleCopySeo}
+                    >
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M20.9983 10C20.9862 7.82497 20.8897 6.64706 20.1213 5.87868C19.2426 5 17.8284 5 15 5H12C9.17157 5 7.75736 5 6.87868 5.87868C6 6.75736 6 8.17157 6 11V16C6 18.8284 6 20.2426 6.87868 21.1213C7.75736 22 9.17157 22 12 22H15C17.8284 22 19.2426 22 20.1213 21.1213C21 20.2426 21 18.8284 21 16V15"
+                          stroke="#FFFFFF"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                        />
+
+                        <path
+                          d="M3 10V16C3 17.6569 4.34315 19 6 19M18 5C18 3.34315 16.6569 2 15 2H11C7.22876 2 5.34315 2 4.17157 3.17157C3.51839 3.82475 3.22937 4.69989 3.10149 6"
+                          stroke="#FFFFFF"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </Tippy>
+                </h3>
+                <div className="mt-1 flex flex-wrap gap-2">
+                  {seoTags.content.map((tag: any, index: number) => (
+                    <span
+                      key={index}
+                      className="badge inline-block rounded-full bg-blue-600 px-3 py-1 text-sm transition hover:bg-blue-500"
+                    >
+                      {tag.id ? tag.tag : tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )
+          )}
+          {/* <h3 className="text-lg font-semibold text-gray-200">
+            Product Description
+          </h3>
+          {productDescription.isLoading ? (
+            <LoadingPlaceholder />
+          ) : (
+            <p className="text-gray-300">{productDescription.content}</p>
+          )} */}
+        </div>
+      )}
+
+      <div className=" mt-6 p-4">
+        {productDescription.isLoading ? (
+          <LoadingPlaceholder />
+        ) : (
+          <>
+            <p className="mb-5 font-black text-gray-300">
+              {magicHook.content[0]?.id
+                ? magicHook.content[0].content
+                : magicHook.content[0]}
+            </p>
+            <p className="text-gray-300">
+              {productDescription.content[0]?.id
+                ? productDescription.content[0].product
+                : productDescription.content}
+            </p>
+          </>
+        )}
+      </div>
+      <div className="mt-6 p-4">
+        {benefitStack.isLoading ? (
+          <LoadingPlaceholder />
+        ) : (
+          <ul className="list-disc space-y-2 pl-5 text-gray-300">
+            {benefitStack.content.map((benefit: any, index: number) => (
+              <li key={index}>{benefit.id ? benefit.content : benefit} </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <div className="mt-4 p-4">
+        <h3 className="text-lg font-semibold text-gray-200">FAQs</h3>
+        {faq.isLoading ? (
+          <LoadingPlaceholder />
+        ) : (
+          <div
+            className={`grid ${
+              faq.content.length > 2 ? "md:grid-cols-2" : "md:grid-cols-1"
+            } gap-2`}
+          >
+            {faq.content.map((faqItem, index) => (
+              <div key={index} className="rounded-md bg-gray-800 p-2">
+                <h3 className="text-sm font-semibold text-white">
+                  {faqItem.q}
+                </h3>
+                <p className="mt-2 text-gray-300">{faqItem.a}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="flex items-end justify-end">
+        <Tippy content="Copy (except SEO tags)" placement="top">
+          <button
+            className="mb-5 rounded bg-blue-500 px-4 py-2 text-xs font-bold uppercase text-white shadow outline-none transition-all duration-150 ease-linear hover:shadow-md focus:outline-none active:bg-blue-600 md:mb-0 md:ml-4"
+            onClick={handleCopy}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20.9983 10C20.9862 7.82497 20.8897 6.64706 20.1213 5.87868C19.2426 5 17.8284 5 15 5H12C9.17157 5 7.75736 5 6.87868 5.87868C6 6.75736 6 8.17157 6 11V16C6 18.8284 6 20.2426 6.87868 21.1213C7.75736 22 9.17157 22 12 22H15C17.8284 22 19.2426 22 20.1213 21.1213C21 20.2426 21 18.8284 21 16V15"
+                stroke="#FFFFFF"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              />
+
+              <path
+                d="M3 10V16C3 17.6569 4.34315 19 6 19M18 5C18 3.34315 16.6569 2 15 2H11C7.22876 2 5.34315 2 4.17157 3.17157C3.51839 3.82475 3.22937 4.69989 3.10149 6"
+                stroke="#FFFFFF"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
+        </Tippy>
+        <Tippy content="Delete" placement="top">
+          <button
+            className="mb-5 rounded bg-red-500 px-4 py-2 text-xs font-bold uppercase text-white shadow outline-none transition-all duration-150 ease-linear hover:shadow-md focus:outline-none active:bg-blue-600 md:mb-0 md:ml-4"
+            onClick={() => onRemove(id)}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M3.03365 8.89004C2.55311 5.68645 2.31285 4.08466 3.21049 3.04233C4.10813 2 5.72784 2 8.96727 2H15.033C18.2724 2 19.8922 2 20.7898 3.04233C21.6874 4.08466 21.4472 5.68646 20.9666 8.89004L19.7666 16.89C19.401 19.3276 19.2182 20.5464 18.3743 21.2732C17.5303 22 16.2979 22 13.833 22H10.1673C7.7024 22 6.46997 22 5.62604 21.2732C4.78211 20.5464 4.59929 19.3276 4.23365 16.89L3.03365 8.89004Z"
+                stroke="#FFFFFF"
+                stroke-width="1.5"
+              />
+              <path
+                d="M8 6L3.5 11L11 19M14 6L4 16M20 6L7 19M13 19L20.5 11L16 6M10 6L20 16M4 6L17 19"
+                stroke="#FFFFFF"
+                strokeWidth="1.5"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M21 6H3"
+                stroke="#FFFFFF"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+              <path
+                d="M19 19H5"
+                stroke="#FFFFFF"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        </Tippy>
+      </div>
+    </div>
+  );
+};
+
+export default CommerceResults;

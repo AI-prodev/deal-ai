@@ -1,0 +1,74 @@
+.Layout-image {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+}
+
+.Layout-FullWidth {
+  width: 100%;
+  max-width: 100%;
+  min-height: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+
+.Layout-Wide {
+  width: 1200px;
+  max-width: 100%;
+  min-height: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+
+.Layout-Medium {
+  width: 800px;
+  max-width: 100%;
+  min-height: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+
+.Layout-Small {
+  width: 600px;
+  max-width: 100%;
+  min-height: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+
+@media (max-width: 1240px) {
+  .Layout-Wide {
+    width: 800px;
+  }
+}
+
+@media (max-width: 840px) {
+  .Layout-Wide {
+    width: 600px;
+  }
+
+  .Layout-Medium {
+    width: 600px;
+  }
+}
+
+@media (max-width: 640px) {
+  .Layout-Wide {
+    width: calc(100% - 40px);
+  }
+
+  .Layout-Medium {
+    width: calc(100% - 40px);
+  }
+
+  .Layout-Small {
+    width: calc(100% - 40px);
+  }
+}

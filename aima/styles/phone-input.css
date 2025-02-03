@@ -1,0 +1,28 @@
+.phone-input-container {
+  height: 43px;
+  width: 220px !important;
+  border-radius: 6.75px !important;
+  border-top-left-radius: 6.75px !important;
+  border-bottom-left-radius: 6.75px !important;
+  /* border: 1px solid black !important; */
+}
+
+.phone-input-text {
+  height: 43px !important;
+  width: 220px !important;
+  border: 1px solid black !important;
+  border-radius: 6.75px !important;
+  border-top-right-radius: 6.75px !important;
+  border-bottom-right-radius: 6.75px !important;
+}
+
+.phone-input-container .flag-dropdown,
+.flag-dropdown:hover {
+  border: 1px solid black !important;
+  border-top-left-radius: 6.75px !important;
+  border-bottom-left-radius: 6.75px !important;
+}
+
+.phone-input-container .selected-flag:hover {
+  background-color: transparent !important;
+}

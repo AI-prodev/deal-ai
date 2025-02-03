@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title></title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+</head>
+<body>
+  <script>
+    function getBaseUrl() {
+      const parsedUrl = new URL(window.location.href);
+
+      return parsedUrl.protocol + "//" + parsedUrl.host;
+    }
+
+    function proxyUrls(htmlContent) {
+      const urlRegex = /https?:\/\/(use\.fontawesome\.com|app\.clickfunnels\.com|assets\.clickfunnels\.com|www2\.clickfunnels\.com|images\.clickfunnels\.com)[^"'\s)]+/g;
+
+      let newContent = htmlContent
+        .replace(/&quot;/g, "'")
+        .replace(/<img /g, "<img crossorigin=\"anonymous\" ")
+        .replace(/<link /g, "<link crossorigin=\"anonymous\" ")
+        .replace(urlRegex, (match) => {
+          return `${getBaseUrl()}/page/proxy/${encodeURIComponent(match)}`;
+        });
+
+      const cssUrlRegex = /url\((\'|\")?(https?:\/\/[^)]+)(\'|\")?\)/g;
+
+      // Replace function to add crossorigin(anonymous)
+      newContent = newContent.replace(cssUrlRegex, (match, p1, p2) => {
+          return `url('${p2}' crossorigin(anonymous))`;
+      });
+
+      return newContent;
+    }
+
+    async function initialize() {
+      const content = await(await fetch(`%%%CONTENT_URL%%%`)).text();
+      let proxiedContent = proxyUrls(content);
+      proxiedContent = proxiedContent.replace('</body>', '%%%EXTRA_BODY%%%</body>');
+      proxiedContent = proxiedContent.replace('</head>', '%%%EXTRA_HEAD%%%</head>');
+
+      document.open();
+      document.write(proxiedContent);
+      document.close();
+    }
+    initialize();
+  </script>
+</body>
+</html>

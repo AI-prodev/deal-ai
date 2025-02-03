@@ -1,0 +1,10 @@
+.Text {
+  line-height: 1.5;
+  padding: 0;
+}
+
+@media (max-width: 576px) {
+  .Text {
+    font-size: 18px !important;
+  }
+}

@@ -1,0 +1,33 @@
+.Accordion {
+  width: 100%;
+  margin-top: 15px;
+  box-shadow:
+    6px 6px 10px -1px rgba(0, 0, 0, 0.15),
+    -6px -6px 10px -1px rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.Accordion-label {
+  display: block;
+  cursor: pointer;
+}
+
+.Accordion-label::before {
+  content: "+";
+  margin-right: 10px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.Accordion-input {
+  display: none;
+}
+
+.Accordion-input:checked + label + .Accordion-content {
+  max-height: 400px;
+}
+
+.Accordion-input:checked + label::before {
+  content: "-";
+}

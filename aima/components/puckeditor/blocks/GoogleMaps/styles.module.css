@@ -1,0 +1,17 @@
+.GoogleMap {
+  display: block;
+}
+
+.GoogleMap-map {
+  border: none !important;
+}
+
+@media (max-width: 576px) {
+  .GoogleMap {
+    padding: 0 !important;
+  }
+
+  .GoogleMap-map {
+    width: 100% !important;
+  }
+}

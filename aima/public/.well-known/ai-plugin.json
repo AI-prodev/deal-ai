@@ -1,0 +1,18 @@
+{
+    "schema_version": "v1",
+    "name_for_human": "Apollo business matcher",
+    "name_for_model": "apollo",
+    "description_for_human": "Plugin for finding businesses that match a buyer's acquisition thesis.",
+    "description_for_model": "Plugin for finding businesses that match a buyer's acquisition thesis.",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "https://api.go.deal.ai/openapi.yaml",
+      "is_user_authenticated": false
+    },
+    "logo_url": "https://go.deal.ai/assets/images/deal.ai.png",
+    "contact_email": "matt@deal.ai",
+    "legal_info_url": "http://www.example.com/legal"
+  }

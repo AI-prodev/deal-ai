@@ -1,0 +1,18 @@
+.Headline {
+  display: block;
+  line-height: normal;
+}
+
+@media (max-width: 768px) {
+  .Headline {
+    font-size: 30px !important;
+    padding: 10px 20px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .Headline {
+    font-size: 28px !important;
+    padding: 15px 10px !important;
+  }
+}

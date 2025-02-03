@@ -1,0 +1,91 @@
+.custom-select .css-1dimb5e-singleValue,
+.custom-select .css-166bipr-Input,
+.custom-select .css-qbdosj-Input {
+  @apply dark:text-white-dark text-black;
+}
+
+.custom-select .css-1fdsijx-ValueContainer {
+  @apply !pl-4;
+}
+.custom-select .css-b62m3t-container > div {
+  @apply bg-white dark:bg-[#1b2e4b] border-[rgb(224,230,237)] dark:border-[#253b5c] hover:border-inherit;
+}
+.custom-select .css-b62m3t-container > div:first-of-type {
+  @apply shadow-none;
+}
+
+.custom-select .css-1nmdiq5-menu > div > div {
+  @apply hover:!bg-[#f6f6f6] dark:hover:!bg-[#132136] !bg-transparent;
+}
+.custom-select .css-1nmdiq5-menu > div > div[aria-disabled="true"] {
+  @apply !bg-transparent !text-[#999];
+}
+.custom-select .css-1nmdiq5-menu > div > .css-tr4s17-option {
+  @apply !bg-[#f6f6f6] dark:!bg-[#132136] dark:!text-white-dark !text-black;
+}
+.custom-select .css-1xc3v61-indicatorContainer {
+  @apply dark:text-white-dark text-[#999];
+}
+.custom-select .css-1u9des2-indicatorSeparator {
+  @apply hidden;
+}
+.custom-select .css-1p3m7a8-multiValue {
+  @apply !bg-success !text-white;
+}
+.custom-select .css-wsp0cs-MultiValueGeneric {
+  @apply !text-white;
+}
+
+.custom-select2 .css-1dimb5e-singleValue,
+.custom-select2 .css-166bipr-Input,
+.custom-select2 .css-qbdosj-Input {
+  @apply dark:text-white text-black;
+}
+
+.custom-select2 .css-1fdsijx-ValueContainer {
+  @apply !pl-4;
+}
+.custom-select2 .css-b62m3t-container > div {
+  @apply bg-white dark:bg-[#1b2e4b] border-[rgb(224,230,237)] dark:border-[#253b5c] hover:border-inherit;
+}
+.custom-select2 .css-b62m3t-container > div:first-of-type {
+  @apply shadow-none;
+}
+
+.custom-select2 .css-1nmdiq5-menu > div > div {
+  @apply hover:!bg-[#f6f6f6] dark:hover:!bg-[#132136] !bg-transparent;
+}
+.custom-select2 .css-1nmdiq5-menu > div > div[aria-disabled="true"] {
+  @apply !bg-transparent !text-[#999];
+}
+.custom-select2 .css-1nmdiq5-menu > div > .css-tr4s17-option {
+  @apply !bg-[#f6f6f6] dark:!bg-[#132136] dark:!text-white-dark !text-black;
+}
+.custom-select2 .css-1xc3v61-indicatorContainer {
+  @apply dark:text-white-dark text-[#999];
+}
+.custom-select2 .css-1u9des2-indicatorSeparator {
+  @apply hidden;
+}
+.custom-select2 .css-1p3m7a8-multiValue {
+  @apply !bg-success !text-white;
+}
+.custom-select2 .css-wsp0cs-MultiValueGeneric {
+  @apply !text-white;
+}
+
+.custom-select-fields-bg .css-13cymwt-control {
+  @apply border border-white-light bg-white dark:!bg-[#121e32] dark:!border-[#17263c];
+}
+.custom-select-fields-bg .css-16xfy0z-control {
+  @apply border border-white-light bg-white dark:!bg-[#121e32] dark:!border-[#17263c] opacity-70;
+}
+.custom-select .css-894a34-indicatorSeparator {
+  @apply hidden;
+}
+.custom-select-fields-bg .css-b62m3t-container > div {
+  @apply bg-white dark:!bg-[#121e32] dark:!border-[#17263c];
+}
+.custom-select-fields-bg .css-tr4s17-option {
+  @apply border-none bg-[#f6f6f6] dark:bg-[#deebff] text-white-dark dark:text-[#808080];
+}

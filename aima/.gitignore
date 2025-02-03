@@ -1,0 +1,9 @@
+node_modules
+.next
+.DS_STORE
+.env
+.env.local
+./utils/baseUrl.ts
+.idea
+certificates
+.yarn

@@ -1,0 +1,69 @@
+.Menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.Menu > ul {
+  list-style-type: none;
+}
+
+.Menu > ul > li {
+  display: inline-flex;
+  margin: 0.3em 1em;
+}
+
+.Menu > ul > li > a {
+  text-decoration: none;
+}
+
+.Menu > input[type="checkbox"] {
+  display: none;
+}
+
+.Menu > label {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  .Menu > input[type="checkbox"]:not(:checked) + ul {
+    display: none;
+  }
+
+  .Menu {
+    flex-direction: row;
+    flew-wrap: wrap;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .Menu > label {
+    text-align: right;
+    display: block;
+    padding: 0.5em;
+    line-height: 1.6em;
+    align-self: center;
+  }
+
+  .Menu > ul {
+    display: block;
+  }
+
+  .Menu > ul:last-child {
+    width: 100%;
+    flex-basis: 100%;
+    padding: 0;
+    text-align: center;
+  }
+
+  .Menu > ul > li {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    text-align: right;
+    padding: 0.5rem;
+  }
+}

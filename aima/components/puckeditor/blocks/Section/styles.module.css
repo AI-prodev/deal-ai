@@ -1,0 +1,18 @@
+.Section:not(.Section .Section) {
+  padding-left: 16px;
+  padding-right: 16px;
+  color: #000000;
+}
+
+@media (min-width: 768px) {
+  .Section:not(.Section .Section) {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+.Section:not(.Section .Section) .Section-inner {
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}

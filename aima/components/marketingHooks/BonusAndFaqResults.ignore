@@ -1,0 +1,287 @@
+import { HookData } from "@/pages/apps/magic-hooks";
+import Tippy from "@tippyjs/react";
+import React, { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/router";
+import StarRating from "./StarRating";
+import {
+  useBenefitStackRateCreationMutation,
+  useStartBenefitStackRequestMutation,
+} from "@/store/features/benefitStacksApi";
+import {
+  useStartBonusStackRequestMutation,
+  useStartFaqRequestMutation,
+} from "@/store/features/bonusAndFaqApi";
+import { HookItem } from "./BonusHookItem";
+import LocalFunnelHooks from "../funnels/LocalFunnelHooks";
+import { ThesisBuildingProgress } from "../ThesisBuildingProgress";
+
+interface FormValues {
+  businessDescription: string;
+  tone: string;
+  toneAdditionalInfo: string;
+  aggressiveness: number;
+  hookCreative: number;
+  hookLength: number;
+  targetAudience: string;
+  language: string;
+}
+
+export const BonusAndFaqResults = ({
+  hooksData,
+  type,
+  title,
+  isCreatingMore,
+  remainingTime,
+}: {
+  hooksData: HookData[];
+  type: "bonus" | "faq";
+  title: string;
+  isCreatingMore: boolean;
+  remainingTime: number;
+}) => {
+  const router = useRouter();
+  const [businessDescription, setBusinessDescription] = useState("");
+  const [hookLength, setHookLength] = useState(7);
+  const [aggressiveness, setAggressiveness] = useState(8);
+  const [hookCreative, setHookCreative] = useState(10);
+  const [language, setLanguage] = useState("English");
+  const [targetAudience, setTargetAudience] = useState("everyone");
+  const [tone, setTone] = useState("Inspirational");
+  const [toneAdditionalInfo, setToneAdditionalInfo] = useState("");
+  const [displayCount, setDisplayCount] = useState(20);
+  const [copiedData, setCopiedData] = useState("");
+  const [hookRatings, setHookRatings] = useState<{ [key: string]: number }>({});
+  const [loadingStates, setLoadingStates] = useState<{
+    [key: string]: boolean;
+  }>({});
+
+  const minutes = Math.floor(remainingTime / 60);
+  const seconds = remainingTime % 60;
+
+  const [startBonusRequest, { isLoading: isStartingBonus }] =
+    useStartBonusStackRequestMutation();
+  const [startFaqRequest, { isLoading: isStartingFaq }] =
+    useStartFaqRequestMutation();
+
+  const [rateCreation] = useBenefitStackRateCreationMutation();
+  const formatHookRatingData = () => {
+    return Object.entries(hookRatings)
+      .map(
+        ([hookText, rating]) =>
+          `${hookText}\nRating: ${rating} star${rating > 1 ? "s" : ""}`,
+      )
+      .join("\n\n");
+  };
+  const handleViewMore = () => {
+    setDisplayCount((prevCount) => prevCount + 20);
+  };
+
+  const handleRatingChange = async (
+    hookText: string,
+    newRating: number,
+    hookId: string,
+  ) => {
+    setLoadingStates({ ...loadingStates, [hookId]: true });
+
+    setHookRatings({ ...hookRatings, [hookText]: newRating });
+
+    try {
+      const response = await rateCreation({
+        creationId: hookId,
+        rating: newRating,
+      }).unwrap();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingStates({ ...loadingStates, [hookId]: false });
+    }
+  };
+  const handleCopy = (hook: any) => {
+    const hookData =
+      type === "bonus" ? `${hook.b} - ${hook.r}` : `${hook.q} - ${hook.a}`;
+    setCopiedData(hookData);
+    navigator.clipboard.writeText(hookData);
+  };
+
+  const handleCopyAll = (generationId: number) => {
+    const generationHooks = hooksData.find(
+      (gen) => gen.id === generationId,
+    )?.hooks;
+    if (generationHooks) {
+      const hooksText = generationHooks
+        .map((hook) =>
+          type === "bonus" ? `${hook.b} - ${hook.r}` : `${hook.q} - ${hook.a}`,
+        )
+        .join("\n");
+      navigator.clipboard.writeText(hooksText);
+    }
+  };
+  const latestGenerationId =
+    hooksData.length > 0 ? hooksData[hooksData.length - 1].id : null;
+  const handleCreateMore = async () => {
+    if (latestGenerationId === null) return;
+
+    const formattedRatingHooks = formatHookRatingData();
+    const latestGeneration = hooksData.find(
+      (gen) => gen.id === latestGenerationId,
+    );
+    const desc = latestGeneration?.hooks[0].input.businessDescription;
+    const benefitStack = latestGeneration?.hooks[0].input.benefitStack;
+
+    const data = {
+      businessDescription: businessDescription,
+      hookLength: hookLength,
+      benefitStack: benefitStack,
+      ratedHooks: formattedRatingHooks,
+      aggressiveness: aggressiveness,
+      hookCreative: hookCreative,
+      language: language,
+      targetAudience: targetAudience,
+      tone: tone,
+      toneAdditionalInfo: toneAdditionalInfo,
+
+    };
+    try {
+      let startResult;
+      if (type === "bonus") {
+        startResult = await startBonusRequest({ input: data }).unwrap();
+      } else if (type === "faq") {
+        startResult = await startFaqRequest({ input: data }).unwrap();
+      }
+
+      if (startResult && startResult.token) {
+        const path = type === "bonus" ? `/apps/bonus-stack/` : `/apps/faq/`;
+        router.replace(`${path}${startResult.token}`);
+      }
+
+    } catch (error) {
+      console.error("Failed to create hooks", error);
+    }
+  };
+
+  const handleValuesChange = (values: FormValues) => {
+    setBusinessDescription(values.businessDescription);
+    setHookLength(values.hookLength);
+    setAggressiveness(values.aggressiveness);
+    setHookCreative(values.hookCreative);
+    setLanguage(values.language);
+    setTargetAudience(values.targetAudience);
+    setTone(values.tone);
+    setToneAdditionalInfo(values.toneAdditionalInfo);
+  };
+  const scrollToLatestGeneration = () => {
+    if (hooksData.length > 0) {
+      const latestGenerationId = Math.max(
+        ...hooksData.map((generation) => generation.id),
+      );
+      const latestGenerationElement = document.getElementById(
+        `generation-${latestGenerationId}`,
+      );
+
+      if (latestGenerationElement) {
+        const topOffset = 200;
+        const elementPosition =
+          latestGenerationElement.getBoundingClientRect().top;
+        window.scrollBy({
+          top: elementPosition - topOffset,
+          behavior: "smooth",
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    scrollToLatestGeneration();
+  }, [hooksData, isCreatingMore]);
+  return (
+    <>
+      <>
+        {hooksData.length > 0 && (
+          <div className=" max-w-lg">
+            <LocalFunnelHooks onValuesChange={handleValuesChange} />
+          </div>
+        )}
+
+        {isCreatingMore && (
+          <div className="my-2">
+            <ThesisBuildingProgress
+              minutes={minutes}
+              seconds={seconds}
+              progressCss={
+                "bg-primary h-4 rounded-full w-12/12 animated-progress"
+              }
+            />
+          </div>
+        )}
+
+        {hooksData.length > 0 && !isCreatingMore && (
+          <button
+            className="btn btn-primary !mt-6"
+            onClick={handleCreateMore}
+          >
+            Create Another {title}
+          </button>
+        )}
+      </>
+
+      {hooksData.length > 0 && (
+        <>
+          {hooksData.map((generation, genIndex) => (
+            <div key={genIndex}>
+              <h1
+                className="my-2 mt-10 text-2xl font-bold"
+                id={`generation-${generation.id}`}
+              >
+                Your {title} #{generation.id}
+              </h1>
+              <div className="mt-2 flex flex-col gap-1">
+                {generation.hooks
+                  .slice(0, displayCount)
+                  .map((hook, hookIndex) => (
+                    <React.Fragment key={hookIndex}>
+                      <HookItem
+                        key={hookIndex}
+                        hook={hook}
+                        type={type}
+                        onCopy={handleCopy}
+                        onRateChange={handleRatingChange}
+                        loadingState={loadingStates}
+                        hookRatings={hookRatings}
+                      />
+                    </React.Fragment>
+                  ))}
+              </div>
+              {/* {genIndex === 0 && !isCreatingMore && (
+                <button
+                  className="mx-2 my-2 rounded bg-blue-500 px-4 py-2 text-xs font-bold uppercase text-white shadow outline-none transition-all duration-150 ease-linear hover:shadow-md focus:outline-none"
+                  onClick={() => handleCreateMore()}
+                >
+                  Create More {title}
+                </button>
+              )} */}
+              <button
+                className="mx-4 my-2 flex rounded bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 text-sm font-bold  text-white shadow-lg outline-none transition-all duration-150 ease-linear hover:scale-110 focus:outline-none"
+                onClick={() => handleCopyAll(generation.id)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="mr-2 h-4 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h11a2 2 0 012 2v1"></path>
+                </svg>
+                Copy All
+              </button>
+            </div>
+          ))}
+        </>
+      )}
+    </>
+  );
+};

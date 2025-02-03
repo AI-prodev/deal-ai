@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 294 209.7">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+        stroke-width: 0px;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" y="0" width="294" height="45.7" rx="22.85" ry="22.85"/>
+  <rect class="cls-1" y="82" width="294" height="45.7" rx="22.85" ry="22.85"/>
+  <rect class="cls-1" y="164" width="294" height="45.7" rx="22.85" ry="22.85"/>
+</svg>

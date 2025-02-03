@@ -1,0 +1,81 @@
+export const FontFamilyList = [
+  { label: "Arial", value: "Arial" },
+  { label: "Arial Black", value: "Arial Black" },
+  { label: "Comic Sans MS", value: "Comic Sans MS" },
+  { label: "Courier New", value: "Courier New" },
+  { label: "Georgia", value: "Georgia" },
+  { label: "Impact", value: "Impact" },
+  { label: "Lucida Console", value: "Lucida Console" },
+  { label: "Lucida Sans Unicode", value: "Lucida Sans Unicode" },
+  { label: "Palatino Linotype", value: "Palatino Linotype" },
+  { label: "Tahoma", value: "Tahoma" },
+  { label: "Times New Roman", value: "Times New Roman" },
+  { label: "Trebuchet MS", value: "Trebuchet MS" },
+  { label: "Verdana", value: "Verdana" },
+  { label: "MS Sans Serif", value: "MS Sans Serif" },
+  { label: "MS Serif", value: "MS Serif" },
+  { label: "Cursive", value: "Cursive" },
+  { label: "Fantasy", value: "Fantasy" },
+  { label: "Monospace", value: "Monospace" },
+  { label: "Serif", value: "Serif" },
+  { label: "Sans-serif", value: "Sans-serif" },
+  {
+    label: "Arial, Helvetica, sans-serif",
+    value: "Arial, Helvetica, sans-serif",
+  },
+  {
+    label: "Arial Black, Gadget, sans-serif",
+    value: "Arial Black, Gadget, sans-serif",
+  },
+  { label: "Comic Sans MS, cursive", value: "Comic Sans MS, cursive" },
+  {
+    label: "Courier New, Courier, monospace",
+    value: "Courier New, Courier, monospace",
+  },
+  { label: "Georgia, serif", value: "Georgia, serif" },
+  {
+    label: "Impact, Charcoal, sans-serif",
+    value: "Impact, Charcoal, sans-serif",
+  },
+  {
+    label: "Lucida Console, Monaco, monospace",
+    value: "Lucida Console, Monaco, monospace",
+  },
+  {
+    label: "Lucida Sans Unicode, Lucida Grande, sans-serif",
+    value: "Lucida Sans Unicode, Lucida Grande, sans-serif",
+  },
+  {
+    label: "Palatino Linotype, Book Antiqua, Palatino, serif",
+    value: "Palatino Linotype, Book Antiqua, Palatino, serif",
+  },
+  {
+    label: "Tahoma, Geneva, sans-serif",
+    value: "Tahoma, Geneva, sans-serif",
+  },
+  {
+    label: "Times New Roman, Times, serif",
+    value: "Times New Roman, Times, serif",
+  },
+  {
+    label: "Trebuchet MS, Helvetica, sans-serif",
+    value: "Trebuchet MS, Helvetica, sans-serif",
+  },
+  {
+    label: "Verdana, Geneva, sans-serif",
+    value: "Verdana, Geneva, sans-serif",
+  },
+  {
+    label: "MS Sans Serif, Geneva, sans-serif",
+    value: "MS Sans Serif, Geneva, sans-serif",
+  },
+  {
+    label: "MS Serif, New York, sans-serif",
+    value: "MS Serif, New York, sans-serif",
+  },
+  { label: "Cursive, sans-serif", value: "Cursive, sans-serif" },
+  { label: "Fantasy, sans-serif", value: "Fantasy, sans-serif" },
+  { label: "Monospace, sans-serif", value: "Monospace, sans-serif" },
+  { label: "Serif, sans-serif", value: "Serif, sans-serif" },
+  { label: "Sans-serif, sans-serif", value: "Sans-serif, sans-serif" },
+];

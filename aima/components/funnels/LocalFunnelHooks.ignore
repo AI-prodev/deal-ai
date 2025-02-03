@@ -1,0 +1,238 @@
+// MarketingForms.tsx
+import { Field, FieldArray, Form, Formik, FormikProps } from "formik";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import {
+  ComponentFieldWithLabel,
+  FieldWithLabel,
+} from "../marketingHooks/FieldWithLabel"; // make sure to import the new component
+import RangeSlider from "../marketingHooks/RangeSlider";
+import { useRouter } from "next/router";
+import ToneSelector from "../marketingHooks/ToneSelector";
+
+import * as Yup from "yup";
+import { showErrorToastTimer, showSuccessToast } from "@/utils/toast";
+
+import "tippy.js/dist/tippy.css";
+
+import { createFunnelApi } from "@/store/features/projectApi";
+import { IFunnel } from "@/interfaces/IFunnel";
+import { useSelectiveLocalStorageForm } from "@/hooks/useLocalStorageForm";
+import Tippy from "@tippyjs/react";
+import { languages } from "@/utils/data/Languages";
+
+interface FormValues {
+  businessDescription: string;
+  tone: string;
+  toneAdditionalInfo: string;
+  aggressiveness: number;
+  hookCreative: number;
+  hookLength: number;
+  targetAudience: string;
+  language: string;
+}
+interface LocalFunnelHooksProps {
+  onValuesChange: (values: FormValues) => void;
+}
+
+const LocalFunnelHooks: React.FC<LocalFunnelHooksProps> = ({
+  onValuesChange,
+}) => {
+  const router = useRouter();
+  const funnelId = router.query.funnelId as string;
+  const { data: funnel } = createFunnelApi.useGetFunnelQuery(
+    { funnelId },
+    { skip: !funnelId },
+  );
+  const localStorageKey = "hooksFormValues";
+  const fieldsToPersist: (keyof FormValues)[] = [
+    "businessDescription",
+    "tone",
+    "toneAdditionalInfo",
+    "aggressiveness",
+    "hookCreative",
+    "targetAudience",
+  ];
+  const initialFormValues: FormValues = {
+    businessDescription: "",
+    tone: "",
+    toneAdditionalInfo: "",
+    aggressiveness: 8,
+    hookCreative: 10,
+    targetAudience: "everyone",
+    hookLength: 7,
+    language: "English",
+  };
+
+  const [formValues, setFormValues] = useSelectiveLocalStorageForm<FormValues>(
+    localStorageKey,
+    initialFormValues,
+    fieldsToPersist,
+  );
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const FormValidation = Yup.object().shape({
+    businessDescription: Yup.string().required(
+      "Please enter the business description",
+    ),
+  });
+
+  const submitForm = (values: FormValues) => {
+    setIsLoading(true);
+    setFormValues(values);
+
+    setIsLoading(false);
+  };
+
+  return (
+    <>
+      <Formik
+        initialValues={formValues}
+        validationSchema={FormValidation}
+        onSubmit={() => {}}
+      >
+        {({ errors, submitCount, touched, values, setFieldValue }) => {
+          // Call onValuesChange whenever values change
+          React.useEffect(() => {
+            onValuesChange(values);
+          }, [values]);
+
+          return (
+            <Form className="space-y-5 text-white">
+              <FieldWithLabel
+                name="businessDescription"
+                label="Business Description"
+                component="textarea"
+                id="businessDescription"
+                className="form-input whitespace-pre-wrap"
+                rows={8}
+                style={{ height: "180px" }}
+                tooltipContent="Business Description: Briefly outlines the functionality and utility of a product or service, avoiding promotional language."
+              />
+              {submitCount
+                ? errors.businessDescription && (
+                    <div className="mt-1 text-danger">
+                      {errors.businessDescription}
+                    </div>
+                  )
+                : ""}
+              <div>
+                <RangeSlider
+                  label="Length"
+                  name="hookLength"
+                  min={1}
+                  max={10}
+                  showValue={false}
+                  leftLabel="Very short"
+                  rightLabel="Very long"
+                  gradient={true}
+                  value={values.hookLength}
+                  tooltipContent="Length of the Description / Answer: Default length is suggested."
+                  onChange={(value) => setFieldValue("hookLength", value)}
+                />
+              </div>
+
+              <ToneSelector
+                tooltipContent={
+                  "Tone: Sets the mood. Default is 'Inspirational'. Adjust according to the message's intended impact."
+                }
+                setFieldValue={setFieldValue}
+                values={values}
+                defaultTone={funnel?.settings?.tone || formValues.tone}
+                defaultAdditionalInfo={
+                  funnel?.settings?.toneAdditionalInfo ||
+                  formValues.toneAdditionalInfo
+                }
+              />
+              <div>
+                <RangeSlider
+                  label="Persuasiveness"
+                  name="aggressiveness"
+                  min={1}
+                  max={10}
+                  tooltipContent="Persuasiveness: Controls the intensity of the sales pitch. Default for most, decrease for conservative fields like banking."
+                  leftLabel="Low"
+                  rightLabel="High"
+                  gradient={true}
+                  showValue={false}
+                  value={values.aggressiveness}
+                  onChange={(value) => setFieldValue("aggressiveness", value)}
+                />
+              </div>
+
+              <div>
+                <RangeSlider
+                  label="Creativity"
+                  name="hookCreative"
+                  min={1}
+                  max={12}
+                  tooltipContent="Creativity: Standard setting fits most businesses. Decrease for industries where creativity is less appreciated."
+                  showValue={false}
+                  leftLabel="Low"
+                  rightLabel="High"
+                  gradient={true}
+                  value={values.hookCreative}
+                  onChange={(value) => setFieldValue("hookCreative", value)}
+                />
+              </div>
+
+              <FieldWithLabel
+                name="targetAudience"
+                label="Target audience"
+                component="textarea"
+                tooltipContent={`Target Audience: Specify if known, such as "busy professionals" or "medical doctors", or leave default.`}
+                id="targetAudience"
+                className="form-input whitespace-pre-wrap"
+                rows={1}
+              />
+
+              <div className="mb-4">
+                <Tippy
+                  content={
+                    "Experimental! Languages other than English may not work as well. Please let us know how they work for your language using the Contact Us form."
+                  }
+                  placement="top"
+                >
+                  <label
+                    htmlFor="language"
+                    className="font-semibold text-white"
+                  >
+                    Language
+                  </label>
+                </Tippy>
+                <Field
+                  as="select"
+                  name="language"
+                  className="form-select mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                    const selectedLanguage = e.target.value;
+                    setFieldValue("language", selectedLanguage);
+                  }}
+                >
+                  {languages.map((language, index) => (
+                    <option key={index} value={language.name}>
+                      {language.name}
+                    </option>
+                  ))}
+                </Field>
+                {touched.language && errors.language ? (
+                  <div className="mt-1 text-danger">{errors.language}</div>
+                ) : null}
+              </div>
+
+              {/* <button
+                disabled={isLoading}
+                type="submit"
+                className="btn btn-primary !my-6 "
+              >
+                Save
+              </button> */}
+            </Form>
+          );
+        }}
+      </Formik>
+    </>
+  );
+};
+
+export default LocalFunnelHooks;

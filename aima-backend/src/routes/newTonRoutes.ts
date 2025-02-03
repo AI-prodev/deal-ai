@@ -1,0 +1,137 @@
+import express from "express"
+
+import { authenticate, hasRoles } from "../middlewares/auth"
+import {
+    getBusinessInformationRequestById,
+    getBusinessInformationRequestsByBuyerId,
+    getBusinessInformationRequestsBySellerId,
+    getBusinessInformationRequestsForConsulting,
+    getSellerByBusinessMetadata,
+    getSignedUrlFromS3,
+    newTonStartRequest,
+    patchBusinessInformationRequestById,
+    sendSellerChecklist,
+    sendSellerPropertyChecklist
+} from "../controllers/newTonController"
+import { rateLimitBuyerFreeRole } from "../middlewares/rateLimit"
+
+export const newTonRoutes = express.Router()
+
+newTonRoutes.get(
+    "/newton/bi-request-list/seller/:id",
+    authenticate,
+    hasRoles(["admin", "buyer", "seller", "consulting", "externalseller"]),
+    getBusinessInformationRequestsBySellerId
+)
+newTonRoutes.get(
+    "/newton/bi-request-list/buyer/:id",
+    authenticate,
+    hasRoles([
+        "admin",
+        "buyer",
+        "seller",
+        "consulting",
+        "externalseller",
+        "buyerfree"
+    ]),
+    getBusinessInformationRequestsByBuyerId
+)
+
+newTonRoutes.get(
+    "/newton/bi-request/:id",
+    authenticate,
+    hasRoles([
+        "admin",
+        "buyer",
+        "seller",
+        "consulting",
+        "externalseller",
+        "buyerfree"
+    ]),
+    getBusinessInformationRequestById
+)
+newTonRoutes.get(
+    "/newton/bi-request-files/signed-url",
+    authenticate,
+    hasRoles([
+        "admin",
+        "buyer",
+        "seller",
+        "consulting",
+        "externalseller",
+        "buyerfree"
+    ]),
+    getSignedUrlFromS3
+)
+newTonRoutes.patch(
+    "/newton/bi-request",
+    authenticate,
+    hasRoles([
+        "admin",
+        "buyer",
+        "seller",
+        "consulting",
+        "externalseller",
+        "buyerfree"
+    ]),
+    patchBusinessInformationRequestById
+)
+newTonRoutes.post(
+    "/newton",
+    authenticate,
+    hasRoles([
+        "admin",
+        "buyer",
+        "seller",
+        "consulting",
+        "externalseller",
+        "buyerfree"
+    ]),
+    rateLimitBuyerFreeRole,
+    newTonStartRequest
+)
+newTonRoutes.post(
+    "/newton/bi-request",
+    authenticate,
+    hasRoles([
+        "admin",
+        "buyer",
+        "seller",
+        "consulting",
+        "externalseller",
+        "buyerfree"
+    ]),
+    sendSellerChecklist
+)
+newTonRoutes.post(
+    "/newton/property-bi-request",
+    authenticate,
+    hasRoles([
+        "admin",
+        "buyer",
+        "seller",
+        "consulting",
+        "externalseller",
+        "buyerfree"
+    ]),
+    sendSellerPropertyChecklist
+)
+newTonRoutes.post(
+    "/newton/seller",
+    authenticate,
+    hasRoles([
+        "admin",
+        "buyer",
+        "seller",
+        "consulting",
+        "externalseller",
+        "buyerfree"
+    ]),
+    getSellerByBusinessMetadata
+)
+newTonRoutes.get(
+    "/newton/consulting-bi-list",
+    authenticate,
+    hasRoles(["consulting"]),
+    getBusinessInformationRequestsForConsulting
+)

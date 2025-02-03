@@ -1,0 +1,387 @@
+.icon {
+  font-family: 'FontAwesome';
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body,
+html {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+#toast-container {
+  font-size: 13px;
+  font-weight: lighter;
+}
+
+#toast-container > div {
+  opacity: 0.95;
+}
+
+#toast-container > div,
+#toast-container > div:hover {
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  font-family: Helvetica, sans-serif;
+}
+
+/* LOGO VERSION */
+.gjs-editor {
+  font-size: 1rem;
+}
+.gjs-block-label {
+  font-size: 0.75rem;
+}
+
+.gjs-pn-commands .gjs-pn-buttons,
+#gjs-pn-commands .gjs-pn-buttons {
+  display: block;
+  margin: 0;
+  text-align: left;
+  padding: 4px;
+}
+
+.gjs-pn-commands .gjs-pn-buttons .gjs-pn-btn {
+  display: inline-flex;
+}
+
+.gjs-pn-commands .gjs-pn-buttons .gjs-pn-btn:first-child,
+#gjs-pn-commands .gjs-pn-buttons .gjs-pn-btn:first-child {
+  display: none;
+}
+.gjs-pn-panel .gjs-pn-btn svg {
+  max-width: none !important;
+}
+
+.gjs-pn-devices-c {
+  left: 90px;
+  top: 5px;
+}
+
+.gjs-logo {
+  height: 30px;
+}
+
+.gjs-logo-cont {
+  position: relative;
+  display: inline-block;
+  top: 3px;
+}
+
+/* INFO PANEL */
+
+.gjs-mdl-dialog-sm {
+  width: 300px;
+}
+
+#info-panel {
+  line-height: 17px;
+}
+
+.info-panel-logo {
+  display: block;
+  height: 90px;
+  margin: 0 auto;
+  width: 90px;
+}
+
+.info-panel-logo path {
+  stroke: #eee !important;
+  stroke-width: 8 !important;
+}
+
+.info-panel-label {
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.info-panel-link {
+  text-decoration: none;
+}
+
+/* ADS */
+
+.gjs-pn-panel#gjs-pn-views-container,
+.gjs-pn-panel.gjs-pn-views-container {
+  height: 100%;
+}
+
+.gjs-pn-views-container {
+  width: 300px;
+}
+
+.gjs-pn-views {
+  width: 300px;
+}
+
+.gjs-cv-canvas {
+  width: calc(100% - 300px);
+}
+
+.gjs-block-label svg,
+.gjs-block__media svg {
+  width: 54px;
+}
+
+#gjs-clm-tag-label, #gjs-clm-checkbox, #gjs-clm-close {
+  color: #1A1E38 !important;
+}
+
+/* Temporary fix #2490 */
+.gjs-clm-tag-status,
+.gjs-clm-tag-close {
+  width: 12px;
+  height: 12px;
+}
+
+.gjs-clm-tags-btn {
+  width: 24px;
+}
+
+/* Primary color for the background */
+.gjs-one-bg {
+  background-color: #1A1E38 !important;
+}
+
+/* Secondary color for the text color */
+.gjs-two-color {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Tertiary color for the background */
+.gjs-three-bg {
+  background-color: white !important;
+  color: white !important;
+}
+
+/* Quaternary color for the text color */
+.gjs-four-color,
+.gjs-four-color-h:hover {
+  color: white !important;
+}
+
+/* Saving Overlay */
+#saving-overlay {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  top: 0;
+  left: 0;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
+.toolbar-button-font {
+  font-family: Helvetica, sans-serif;
+  font-feature-settings: normal;
+  font-kerning: auto;
+  font-optical-sizing: auto;
+  font-size: 17px;
+  font-stretch: 100%;
+  font-style: normal;
+  font-variant-alternates: normal;
+  font-variant-caps: normal;
+  font-variant-east-asian: normal;
+  font-variant-ligatures: normal;
+  font-variant-numeric: normal;
+  font-variant-position: normal;
+  font-variation-settings: normal;
+  font-weight: 500;
+}
+
+.icons-flex {
+  background-size: 70% 65% !important;
+  height: 15px;
+  width: 17px;
+  opacity: 0.9;
+}
+
+.icon-dir-row {
+  background: url("../img/flex-dir-row.png") no-repeat center;
+}
+
+.icon-dir-row-rev {
+  background: url("../img/flex-dir-row-rev.png") no-repeat center;
+}
+
+.icon-dir-col {
+  background: url("../img/flex-dir-col.png") no-repeat center;
+}
+
+.icon-dir-col-rev {
+  background: url("../img/flex-dir-col-rev.png") no-repeat center;
+}
+
+.icon-just-start {
+  background: url("../img/flex-just-start.png") no-repeat center;
+}
+
+.icon-just-end {
+  background: url("../img/flex-just-end.png") no-repeat center;
+}
+
+.icon-just-sp-bet {
+  background: url("../img/flex-just-sp-bet.png") no-repeat center;
+}
+
+.icon-just-sp-ar {
+  background: url("../img/flex-just-sp-ar.png") no-repeat center;
+}
+
+.icon-just-sp-cent {
+  background: url("../img/flex-just-sp-cent.png") no-repeat center;
+}
+
+.icon-al-start {
+  background: url("../img/flex-al-start.png") no-repeat center;
+}
+
+.icon-al-end {
+  background: url("../img/flex-al-end.png") no-repeat center;
+}
+
+.icon-al-str {
+  background: url("../img/flex-al-str.png") no-repeat center;
+}
+
+.icon-al-center {
+  background: url("../img/flex-al-center.png") no-repeat center;
+}
+
+.icon-style-manager:before {
+  content: "\e900";
+  color: #fff;
+  width: 7px;
+  height: 7px;
+  font-size: 43px;
+}
+
+[data-tooltip]::after {
+  background: rgba(51, 51, 51, 0.9);
+}
+
+.gjs-pn-commands {
+  width: calc(100% - 300px);
+  min-height: 40px;
+}
+
+.gjs-pn-options {
+  right: 300px;
+}
+
+#gjs-sm-float {
+  display: none;
+}
+
+.gjs-pn-btn.gjs-pn-active {
+  box-shadow: none;
+}
+
+.CodeMirror {
+  min-height: 450px;
+  margin-bottom: 8px;
+}
+
+.grp-handler-close {
+  background-color: transparent;
+  color: #ddd;
+}
+
+.grp-handler-cp-wrap {
+  border-color: transparent;
+}
+
+.modal-tabs {
+  display: flex;
+  justify-content: space-around;
+}
+
+.views {
+  width: 45%;
+}
+
+.modal-textarea {
+  width: 100%;
+  height: 300px;
+  padding: 10px;
+  margin: 5px 0;
+  box-sizing: border-box;
+  color: #fff;
+  background-color: #2C324F;
+  border: 1px solid #48536E;
+  border-radius: 5px;
+}
+
+textarea:hover,
+textarea:focus {
+  background-color: #394269;
+  border-color: #5D6D9E;
+  outline: none;
+}
+
+.modal-button {
+  margin-top: 10px;
+  background-color: rgb(212, 175, 55);
+  color: white;
+  font-weight: 600;
+  font-size: 18px;
+  border-radius: 4px;
+  border: none;
+  padding: 6px 16px;
+  cursor: pointer;
+}
+
+.modal-button-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.code-icons-part {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.code-icons-part::before {
+  margin-right: 8px;
+  font: normal normal normal 17px/1 FontAwesome;
+  position: relative;
+}
+
+.single-panel {
+  display: flex;
+  width: 90px;
+}
+
+.single-panel > span {
+  margin-left: 5px;
+}
+
+.single-panel > svg {
+  width: 17px;
+}
+
+.w-60 {
+  width: 60px;
+}
+
+.manager-icons-part {
+  font-size: 15px;
+  display: flex;
+  justify-content: space-around;
+  flex-basis: content;
+}

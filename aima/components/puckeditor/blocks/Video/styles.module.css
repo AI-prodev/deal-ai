@@ -1,0 +1,23 @@
+.Video {
+  display: block;
+  border: none;
+  outline: none;
+}
+
+.Video-left {
+  margin-right: auto;
+}
+
+.Video-center {
+  margin: 0 auto;
+}
+
+.Video-right {
+  margin-left: auto;
+}
+
+@media (max-width: 576px) {
+  .Video {
+    width: 100% !important;
+  }
+}
